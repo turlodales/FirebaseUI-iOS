@@ -88,6 +88,11 @@ static NSString *const kFacebookDisplayName = @"FacebookDisplayName";
   NSString *_email;
 }
 
++ (NSBundle *)bundle {
+  return [FUIAuthUtils bundleNamed:kBundleName
+                 inFrameworkBundle:[NSBundle bundleForClass:[self class]]];
+}
+
 - (instancetype)initWithAuthUI:(FUIAuth *)authUI
                    permissions:(NSArray *)permissions {
   self = [super init];
@@ -145,11 +150,13 @@ static NSString *const kFacebookDisplayName = @"FacebookDisplayName";
 }
 
 - (NSString *)signInLabel {
-  return FUILocalizedStringFromTableInBundle(kSignInWithFacebook, kTableName, kBundleName);
+  return FUILocalizedStringFromTableInBundle(kSignInWithFacebook,
+                                             kTableName,
+                                             [FUIFacebookAuth bundle]);
 }
 
 - (UIImage *)icon {
-  return [FUIAuthUtils imageNamed:@"ic_facebook" fromBundleNameOrNil:kBundleName];
+  return [FUIAuthUtils imageNamed:@"ic_facebook" fromBundle:[FUIFacebookAuth bundle]];
 }
 
 - (UIColor *)buttonBackgroundColor {
@@ -198,9 +205,9 @@ static NSString *const kFacebookDisplayName = @"FacebookDisplayName";
       [self completeSignInFlowWithAccessToken:nil error:newError];
     } else {
       // Retrieve email.
-      [[[FBSDKGraphRequest alloc] initWithGraphPath:@"me" parameters:@{ @"fields" : @"email" }]
-          startWithCompletionHandler:^(FBSDKGraphRequestConnection *connection, id result,
-                                       NSError *error) {
+      [[[FBSDKGraphRequest alloc] initWithGraphPath:@"me" parameters:@{ @"fields" : @"email" }] startWithCompletion:^(id<FBSDKGraphRequestConnecting> connection,
+                                id result,
+                                NSError *error) {
         self->_email = result[@"email"];
       }];
       [self completeSignInFlowWithAccessToken:result.token.tokenString
@@ -274,7 +281,9 @@ static NSString *const kFacebookDisplayName = @"FacebookDisplayName";
     [self callbackWithCredential:nil error:error result:nil];
     return;
   }
-  FIRAuthCredential *credential = [FIRFacebookAuthProvider credentialWithAccessToken:accessToken];
+  // Assume accessToken cannot be nil if there's no error.
+  NSString *_Nonnull token = (id _Nonnull)accessToken;
+  FIRAuthCredential *credential = [FIRFacebookAuthProvider credentialWithAccessToken:token];
   UIActivityIndicatorView *activityView =
       [FUIAuthBaseViewController addActivityIndicator:_presentingViewController.view];
   [activityView startAnimating];
@@ -311,9 +320,11 @@ static NSString *const kFacebookDisplayName = @"FacebookDisplayName";
   NSString *facebookDisplayName = [bundle objectForInfoDictionaryKey:kFacebookDisplayName];
 
   if (facebookAppId == nil || facebookDisplayName == nil) {
-    bundle = [FUIAuthUtils bundleNamed:nil];
-    facebookAppId = [bundle objectForInfoDictionaryKey:kFacebookAppId];
-    facebookDisplayName = [bundle objectForInfoDictionaryKey:kFacebookDisplayName];
+    // Executes in test targets only.
+    bundle = [FUIFacebookAuth bundle];
+    facebookAppId = facebookAppId ?: [bundle objectForInfoDictionaryKey:kFacebookAppId];
+    facebookDisplayName = facebookDisplayName ?:
+        [bundle objectForInfoDictionaryKey:kFacebookDisplayName];
   }
 
   if (!(facebookAppId && facebookDisplayName)) {

@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'FirebaseAuthUI'
-  s.version      = '11.0.0'
+  s.version      = '11.0.3'
   s.summary      = 'A prebuilt authentication UI flow for Firebase Auth.'
   s.homepage     = 'https://github.com/firebase/FirebaseUI-iOS'
   s.license      = { :type => 'Apache 2.0', :file => 'LICENSE' }
@@ -17,11 +17,9 @@ Pod::Spec.new do |s|
 
   s.public_header_files = 'FirebaseAuthUI/Sources/Public/FirebaseAuthUI/*.h'
   s.source_files = 'FirebaseAuthUI/Sources/**/*.{h,m}'
-  s.dependency 'Firebase/Auth', '~> 8.0'
-  s.dependency 'FirebaseAuth'
+  s.dependency 'FirebaseAuth', '~> 8.0'
   s.dependency 'FirebaseCore'
-  s.dependency 'GoogleUtilities/UserDefaults'
-  s.resource_bundle = {
+  s.resource_bundles = {
     'FirebaseAuthUI' => ['FirebaseAuthUI/Sources/{Resources,Strings}/*.{xib,png,lproj}']
   }
 

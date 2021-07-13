@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'FirebaseAnonymousAuthUI'
-  s.version      = '11.0.0'
+  s.version      = '11.0.3'
   s.summary      = 'Provides anonymous auth support for FirebaseAuthUI.'
   s.homepage     = 'https://github.com/firebase/FirebaseUI-iOS'
   s.license      = { :type => 'Apache 2.0', :file => 'LICENSE' }
@@ -9,7 +9,6 @@ Pod::Spec.new do |s|
   s.platform = :ios
   s.ios.deployment_target = '10.0'
   s.ios.framework = 'UIKit'
-  s.static_framework = true
   s.requires_arc = true
   s.cocoapods_version = '>= 1.8.0'
   s.pod_target_xcconfig = {
@@ -21,7 +20,7 @@ Pod::Spec.new do |s|
   s.dependency 'FirebaseAuthUI'
   s.dependency 'FirebaseAuth', '~> 8.0'
   s.dependency 'FirebaseCore'
-  s.resource_bundle = {
+  s.resource_bundles = {
     'FirebaseAnonymousAuthUI' => [
       'FirebaseAnonymousAuthUI/Sources/{Resources,Strings}/*.{png,lproj}'
     ]
